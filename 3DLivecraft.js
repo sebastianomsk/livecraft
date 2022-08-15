@@ -23,8 +23,9 @@ class Block {
         this.z = z;
         this.display = function () {
             let blockBox = new THREE.BoxBufferGeometry(5, 5, 5); // w, h, d Pixel blocks
-            let blockMesh = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            let block = new THREE.Mesh(blockBox, blockMesh);
+            let blockMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            let block = new THREE.Mesh(blockBox, materiaArray);
+            // let block = new THREE.Mesh(blockBox, blockMaterial);
             scene.add(block);
             block.position.x = this.x;
             block.position.y = this.y - 10;
@@ -42,6 +43,19 @@ class Block {
     }
 }
 
+//
+// Loader of texture
+//
+let loader = new THREE.TextureLoader();
+let materiaArray = [
+    // grassSide could be the same
+    new THREE.MeshBasicMaterial({map : loader.load('./images/texture/grassSide1.png')}),
+    new THREE.MeshBasicMaterial({map : loader.load('./images/texture/grassSide2.png')}),
+    new THREE.MeshBasicMaterial({map : loader.load('./images/texture/grassTop.png')}),
+    new THREE.MeshBasicMaterial({map : loader.load('./images/texture/grassBottom.png')}),
+    new THREE.MeshBasicMaterial({map : loader.load('./images/texture/grassSide3.png')}),
+    new THREE.MeshBasicMaterial({map : loader.load('./images/texture/grassSide4.png')}),
+]
 
 // 
 // Renderizado del terreno, bloques
