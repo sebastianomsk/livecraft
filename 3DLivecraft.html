@@ -5,11 +5,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Livecraft</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+        #autojumpbtn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+        }
+    </style>
 </head>
 <body>
     <script src = "./Three.js"></script>
 	<script src = "./Perlin.js"></script>
 	<script src = "./PointerLockControls.js"></script>
+    <button id = "autojumpbtn" onclick="toggleAutoJump()"><h2>AutoJump : On</h2></button>
 
     <script type="text/javascript" src="./3DLivecraft.js"></script>
 </body>

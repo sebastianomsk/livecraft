@@ -1,7 +1,7 @@
 // Datos del dispositivo
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
-
+const PIXEL_BLOCK = 5;
 //SEED
 noise.seed(Math.random())
 
@@ -22,7 +22,7 @@ class Block {
         this.y = y;
         this.z = z;
         this.display = function () {
-            let blockBox = new THREE.BoxBufferGeometry(5, 5, 5); // w, h, d
+            let blockBox = new THREE.BoxBufferGeometry(5, 5, 5); // w, h, d Pixel blocks
             let blockMesh = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
             let block = new THREE.Mesh(blockBox, blockMesh);
             scene.add(block);
@@ -80,6 +80,7 @@ document.addEventListener("keydown", function(e) {
         // simula la gravedad
         ySpeed = -1.3;
         canJump = false;
+        console.log('Quiere saltar')
     }
 });
 
@@ -111,26 +112,90 @@ controls.addEventListener("unlock", function() {
 });
 
 /**
+ * Auto Jump
+ */
+let autoJump = true;
+function toggleAutoJump() {
+    if (autoJump) {
+        autoJump = false;
+        document.getElementById('autojumpbtn').innerHTML = '<h2>AutoJump : Off</h2>'
+    } else {
+        autoJump = true;
+        document.getElementById('autojumpbtn').innerHTML = '<h2>AutoJump : On</h2>'
+    }
+}
+
+/**
  * Update function and racket code 
  */
  let movingSpeed = 0.7;
  let ySpeed = 0;
  let acc = 0.08;
+ const halfPixelBlock = 2.5;
+
 // 
 // UPDATE 
 //
 function update() {
     if (keys.includes("w")) {
         controls.moveForward(movingSpeed);
+        if (!autoJump) {
+            for (let i = 0; i < blocks.length; i++) {
+                const block = blocks[i];
+                // Check if the player is on top of a block
+                if (wantToMove(block)) {
+                    // Check if the player is on under of a block
+                    if (camera.position.y == block.y - halfPixelBlock) {
+                        controls.moveForward(-1 * movingSpeed);
+                    }
+                }
+            }
+        }
     }
     if (keys.includes("a")) {
         controls.moveRight(-1 * movingSpeed);
+        if (!autoJump) {
+            for (let i = 0; i < blocks.length; i++) {
+                const block = blocks[i];
+                // Check if the player is on top of a block
+                if (wantToMove(block)) {
+                    // Check if the player is on under of a block
+                    if (camera.position.y == block.y - halfPixelBlock) {
+                        controls.moveRight(movingSpeed);
+                    }
+                }
+            }
+        }
     }
     if (keys.includes("s")) {
         controls.moveForward(-1 * movingSpeed);
+        if (!autoJump) {
+            for (let i = 0; i < blocks.length; i++) {
+                const block = blocks[i];
+                // Check if the player is on top of a block
+                if (wantToMove(block)) {
+                    // Check if the player is on under of a block
+                    if (camera.position.y == block.y - halfPixelBlock) {
+                        controls.moveForward(movingSpeed);
+                    }
+                }
+            }
+        }
     }
     if (keys.includes("d")) {
         controls.moveRight(movingSpeed);
+        if (!autoJump) {
+            for (let i = 0; i < blocks.length; i++) {
+                const block = blocks[i];
+                // Check if the player is on top of a block
+                if (wantToMove(block)) {
+                    // Check if the player is on under of a block
+                    if (camera.position.y == block.y - halfPixelBlock) {
+                        controls.moveRight(-1 * movingSpeed);
+                    }
+                }
+            }
+        }
     }
 
     camera.position.y = camera.position.y - ySpeed;
@@ -141,15 +206,10 @@ function update() {
     for (let i = 0; i < blocks.length; i++) {
         const block = blocks[i];
         // Check if the player is on top of a block
-        const isUnderX = camera.position.x <= block.x + 5;
-        const isAboveX = camera.position.x >= block.x;
-        const isUnderZ = camera.position.z <= block.z + 5;
-        const isAboveZ = camera.position.z >= block.z;
-        if (isUnderX && isAboveX && isUnderZ && isAboveZ) {
-        // if (camera.position.x <= block.x + 5 && camera.position.x >= block.x && camera.position.z <= block.z + 5 && camera.position.z >= block.z) {
+        if (wantToMove(block)) {
             // Check if the player is on under of a block
-            if (camera.position.y < block.y) {
-                camera.position.y = block.y;
+            if (camera.position.y <= block.y + halfPixelBlock && camera.position.y >= block.y - halfPixelBlock) {
+                camera.position.y = block.y + halfPixelBlock;
                 ySpeed = 0;//Stop move
                 canJump = true;
                 break;
@@ -158,8 +218,16 @@ function update() {
     }
 }
 
-// Resize window
+// player want to move himself
+function wantToMove (block) {
+    const isUnderX = camera.position.x <= block.x + halfPixelBlock;
+    const isAboveX = camera.position.x >= block.x - halfPixelBlock;
+    const isUnderZ = camera.position.z <= block.z + halfPixelBlock;
+    const isAboveZ = camera.position.z >= block.z - halfPixelBlock;
+    return isUnderX && isAboveX && isUnderZ && isAboveZ;
+}
 
+// Resize window
 window.addEventListener("resize", function() {
     renderer.setSize(windowWidth, windowHeight);
     camera.aspect = windowWidth / windowHeight;
